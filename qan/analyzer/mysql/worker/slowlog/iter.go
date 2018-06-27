@@ -28,8 +28,11 @@ import (
 
 type FilenameFunc func() (string, error)
 
+//type SlowLogFilename string
+
 type Iter struct {
 	logger   *pct.Logger
+	file     string
 	filename FilenameFunc
 	tickChan chan time.Time
 	// --
@@ -42,6 +45,18 @@ func NewIter(logger *pct.Logger, filename FilenameFunc, tickChan chan time.Time)
 	iter := &Iter{
 		logger:   logger,
 		filename: filename,
+		tickChan: tickChan,
+		// --
+		intervalChan: make(chan *iter.Interval, 1),
+		sync:         pct.NewSyncChan(),
+	}
+	return iter
+}
+
+func NewManualIter(logger *pct.Logger, slowFile string, tickChan chan time.Time) *Iter {
+	iter := &Iter{
+		logger:   logger,
+		file:     slowFile,
 		tickChan: tickChan,
 		// --
 		intervalChan: make(chan *iter.Interval, 1),

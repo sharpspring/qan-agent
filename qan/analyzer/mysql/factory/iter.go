@@ -72,6 +72,17 @@ func (f *RealIntervalIterFactory) Make(analyzerType string, mysqlConn mysql.Conn
 	}
 }
 
+func (f *RealIntervalIterFactory) MakeManual(analyzerType string, slowlogloc string, mysqlConn mysql.Connector, tickChan chan time.Time) iter.IntervalIter {
+	switch analyzerType {
+	case "slowlog":
+		return slowlog.NewManualIter(pct.NewLogger(f.logChan, "qan-interval"), slowlogloc, tickChan)
+	case "perfschema":
+		return perfschema.NewIter(pct.NewLogger(f.logChan, "qan-interval"), tickChan)
+	default:
+		panic("Invalid analyzerType: " + analyzerType)
+	}
+}
+
 func AbsDataFile(dataDir, fileName string) string {
 	if !path.IsAbs(fileName) {
 		fileName = path.Join(dataDir, fileName)

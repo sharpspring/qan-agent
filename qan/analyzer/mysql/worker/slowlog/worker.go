@@ -39,6 +39,7 @@ import (
 
 type WorkerFactory interface {
 	Make(name string, config pc.QAN, mysqlConn mysql.Connector) *Worker
+	MakeManual(name string, config pc.QAN, mysqlConn mysql.Connector) *Worker
 }
 
 type RealWorkerFactory struct {
@@ -53,6 +54,10 @@ func NewRealWorkerFactory(logChan chan proto.LogEntry) *RealWorkerFactory {
 }
 
 func (f *RealWorkerFactory) Make(name string, config pc.QAN, mysqlConn mysql.Connector) *Worker {
+	return NewWorker(pct.NewLogger(f.logChan, name), config, mysqlConn)
+}
+
+func (f *RealWorkerFactory) MakeManual(name string, config pc.QAN, mysqlConn mysql.Connector) *Worker {
 	return NewWorker(pct.NewLogger(f.logChan, name), config, mysqlConn)
 }
 

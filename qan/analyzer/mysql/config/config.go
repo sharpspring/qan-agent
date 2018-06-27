@@ -125,6 +125,7 @@ func ValidateConfig(setConfig pc.QAN) (pc.QAN, error) {
 		return runConfig, fmt.Errorf("CollectFrom must be 'slowlog' or 'perfschema'")
 	}
 	runConfig.CollectFrom = setConfig.CollectFrom
+	runConfig.SlowLogLocation = setConfig.SlowLogLocation
 
 	// Integers
 	if setConfig.Interval < 0 || setConfig.Interval > 3600 {

@@ -54,4 +54,5 @@ type IntervalIter interface {
 // An IntervalIterFactory makes an IntervalIter, real or mock.
 type IntervalIterFactory interface {
 	Make(analyzerType string, mysqlConn mysql.Connector, tickChan chan time.Time) IntervalIter
+	MakeManual(analyzerType, slowlogloc string, mysqlConn mysql.Connector, tickChan chan time.Time) IntervalIter
 }

@@ -120,6 +120,7 @@ func (m *MySQLAnalyzer) Start() error {
 	logChan := m.logger.LogChan()
 	var worker worker.Worker
 	analyzerType := config.CollectFrom
+	slowlogloc := config.SlowLogLocation
 	switch analyzerType {
 	case "slowlog":
 		worker = m.slowlogWorkerFactory.Make(name+"-worker", config, mysqlConn)
@@ -130,21 +131,35 @@ func (m *MySQLAnalyzer) Start() error {
 	}
 	worker.SetConfig(config)
 
-	// Create and start a new analyzer. This should return immediately.
-	// The analyzer will configure MySQL, start its iter, then run it worker
-	// for each interval.
-	m.analyzer = NewRealAnalyzer(
-		pct.NewLogger(logChan, name),
-		config,
-		m.iterFactory.Make(analyzerType, mysqlConn, tickChan),
-		mysqlConn,
-		restartChan,
-		worker,
-		m.clock,
-		m.spool,
-	)
+	if *slowlogloc == "auto" {
+		// Create and start a new analyzer. This should return immediately.
+		// The analyzer will configure MySQL, start its iter, then run it worker
+		// for each interval.
+		m.analyzer = NewRealAnalyzer(
+			pct.NewLogger(logChan, name),
+			config,
+			m.iterFactory.Make(analyzerType, mysqlConn, tickChan),
+			mysqlConn,
+			restartChan,
+			worker,
+			m.clock,
+			m.spool,
+		)
 
-	return m.analyzer.Start()
+		return m.analyzer.Start()
+	} else {
+		m.analyzer = NewRealAnalyzer(
+			pct.NewLogger(logChan, name),
+			config,
+			m.iterFactory.MakeManual(analyzerType, *slowlogloc, mysqlConn, tickChan),
+			mysqlConn,
+			restartChan,
+			worker,
+			m.clock,
+			m.spool,
+		)
+		return m.analyzer.Start()
+	}
 }
 
 // Status returns list of statuses
@@ -193,6 +208,7 @@ func (m *MySQLAnalyzer) GetDefaults(uuid string) map[string]interface{} {
 		"MaxSlowLogSize":  m.config.MaxSlowLogSize,
 		"RetainSlowLogs":  m.config.RetainSlowLogs,
 		"SlowLogRotation": m.config.SlowLogRotation,
+		"SlowLogLocation": m.config.SlowLogLocation,
 		"ExampleQueries":  m.config.ExampleQueries,
 		"ReportLimit":     m.config.ReportLimit,
 	}
