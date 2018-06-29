@@ -53,10 +53,12 @@ func NewIter(logger *pct.Logger, filename FilenameFunc, tickChan chan time.Time)
 	return iter
 }
 
-func NewManualIter(logger *pct.Logger, slowFile string, tickChan chan time.Time) *Iter {
+// func NewManualIter(logger *pct.Logger, slowFile string, tickChan chan time.Time) *Iter {
+func NewManualIter(logger *pct.Logger, slowFile string, filename FilenameFunc, tickChan chan time.Time) *Iter {
 	iter := &Iter{
 		logger:   logger,
 		file:     slowFile,
+		filename: filename,
 		tickChan: tickChan,
 		// --
 		intervalChan: make(chan *iter.Interval, 1),
@@ -104,11 +106,15 @@ func (i *Iter) run() {
 			i.logger.Debug("run:tick")
 
 			// Get the MySQL slow log file name at each interval because it can change.
-			curFile, err := i.filename()
-			if err != nil {
-				i.logger.Warn(err)
-				cur = new(iter.Interval)
-				continue
+			curFile := i.file
+			var err error
+			if i.file == "auto" {
+				curFile, err = i.filename()
+				if err != nil {
+					i.logger.Warn(err)
+					cur = new(iter.Interval)
+					continue
+				}
 			}
 
 			// Get the current size of the MySQL slow log.

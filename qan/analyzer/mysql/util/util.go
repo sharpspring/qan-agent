@@ -9,7 +9,7 @@ import (
 func GetMySQLConfig(config pc.QAN) ([]string, []string, error) {
 	switch config.CollectFrom {
 	case "slowlog":
-		if *config.SlowLogLocation != "auto" {
+		if config.SlowLogLocation != "auto" {
 			return []string{"SELECT 1"}, []string{"SELECT 1"}, nil
 		} else {
 			return makeSlowLogConfig()

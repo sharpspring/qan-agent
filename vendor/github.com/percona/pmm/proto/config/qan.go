@@ -17,10 +17,10 @@ type QAN struct {
 	Interval       uint   `json:",omitempty"` // seconds, 0 = DEFAULT_INTERVAL
 	ExampleQueries *bool  `json:",omitempty"` // send real example of each query
 	// "slowlog" specific options.
-	MaxSlowLogSize  int64   `json:"-"`          // bytes, 0 = DEFAULT_MAX_SLOW_LOG_SIZE. Don't write it to the config
-	SlowLogRotation *bool   `json:",omitempty"` // Enable slow logs rotation.
-	SlowLogLocation *string `json:",omitempty"` // slow log file location
-	RetainSlowLogs  *int    `json:",omitempty"` // Number of slow logs to keep.
+	MaxSlowLogSize  int64  `json:"-"`          // bytes, 0 = DEFAULT_MAX_SLOW_LOG_SIZE. Don't write it to the config
+	SlowLogRotation *bool  `json:",omitempty"` // Enable slow logs rotation.
+	SlowLogLocation string `json:",omitempty"` // slow log file location
+	RetainSlowLogs  *int   `json:",omitempty"` // Number of slow logs to keep.
 	// internal
 	Start       []string `json:",omitempty"` // queries to configure MySQL (enable slow log, etc.)
 	Stop        []string `json:",omitempty"` // queries to un-configure MySQL (disable slow log, etc.)
@@ -34,7 +34,7 @@ func NewQAN() QAN {
 		// "slowlog" specific options.
 		MaxSlowLogSize:  DefaultMaxSlowLogSize,
 		SlowLogRotation: boolPointer(DefaultSlowLogRotation),
-		SlowLogLocation: stringPointer(DefaultSlowLogLocation),
+		SlowLogLocation: DefaultSlowLogLocation,
 		RetainSlowLogs:  intPointer(DefaultRetainSlowLogs),
 		// internal
 		ReportLimit: DefaultReportLimit,

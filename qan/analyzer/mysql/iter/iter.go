@@ -32,6 +32,7 @@ type Interval struct {
 	StartTime time.Time // UTC
 	StopTime  time.Time // UTC
 	// slowlog
+	// Filename    *string // slow_query_log_file
 	Filename    string // slow_query_log_file
 	StartOffset int64  // bytes @ StartTime
 	EndOffset   int64  // bytes @ StopTime
@@ -54,5 +55,6 @@ type IntervalIter interface {
 // An IntervalIterFactory makes an IntervalIter, real or mock.
 type IntervalIterFactory interface {
 	Make(analyzerType string, mysqlConn mysql.Connector, tickChan chan time.Time) IntervalIter
+	// MakeManual(analyzerType, slowlogloc *string, mysqlConn mysql.Connector, tickChan chan time.Time) IntervalIter
 	MakeManual(analyzerType, slowlogloc string, mysqlConn mysql.Connector, tickChan chan time.Time) IntervalIter
 }

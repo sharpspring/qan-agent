@@ -131,7 +131,7 @@ func (m *MySQLAnalyzer) Start() error {
 	}
 	worker.SetConfig(config)
 
-	if *slowlogloc == "auto" {
+	if slowlogloc == "auto" {
 		// Create and start a new analyzer. This should return immediately.
 		// The analyzer will configure MySQL, start its iter, then run it worker
 		// for each interval.
@@ -151,7 +151,7 @@ func (m *MySQLAnalyzer) Start() error {
 		m.analyzer = NewRealAnalyzer(
 			pct.NewLogger(logChan, name),
 			config,
-			m.iterFactory.MakeManual(analyzerType, *slowlogloc, mysqlConn, tickChan),
+			m.iterFactory.MakeManual(analyzerType, slowlogloc, mysqlConn, tickChan),
 			mysqlConn,
 			restartChan,
 			worker,

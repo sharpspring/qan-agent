@@ -75,7 +75,10 @@ func (f *RealIntervalIterFactory) Make(analyzerType string, mysqlConn mysql.Conn
 func (f *RealIntervalIterFactory) MakeManual(analyzerType string, slowlogloc string, mysqlConn mysql.Connector, tickChan chan time.Time) iter.IntervalIter {
 	switch analyzerType {
 	case "slowlog":
-		return slowlog.NewManualIter(pct.NewLogger(f.logChan, "qan-interval"), slowlogloc, tickChan)
+		getSlowLogFunc := func() (string, error) {
+			return "auto", nil
+		}
+		return slowlog.NewManualIter(pct.NewLogger(f.logChan, "qan-interval"), slowlogloc, getSlowLogFunc, tickChan)
 	case "perfschema":
 		return perfschema.NewIter(pct.NewLogger(f.logChan, "qan-interval"), tickChan)
 	default:

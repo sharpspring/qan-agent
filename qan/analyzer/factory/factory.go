@@ -89,3 +89,6 @@ func (f *Factory) Make(analyzerType, analyzerName string, protoInstance proto.In
 
 	return nil, UnknownTypeError(analyzerType)
 }
+func (f *Factory) MakeManual(analyzerType, slowlogloc, analyzerName string, protoInstance proto.Instance) (analyzer.Analyzer, error) {
+	return nil, UnknownTypeError(analyzerType)
+}

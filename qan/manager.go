@@ -184,12 +184,15 @@ func (m *Manager) Handle(cmd *proto.Cmd) *proto.Reply {
 		if err := m.startAnalyzer(setConfig); err != nil {
 			switch err {
 			case ErrAlreadyRunning:
+				fmt.Println("hi1")
 				// App reports this error message to user.
 				err = fmt.Errorf("Query Analytics is already running on instance %s. "+
 					"To reconfigure or restart Query Analytics, stop then start it again.",
 					uuid)
+				fmt.Println("hi2")
 				return cmd.Reply(nil, err)
 			default:
+				fmt.Println("hi3")
 				return cmd.Reply(nil, err)
 			}
 		}
@@ -354,14 +357,25 @@ func (m *Manager) startAnalyzer(setConfig pc.QAN) (err error) {
 		"-",
 	)
 
-	// Create and start a new analyzer. This should return immediately.
-	analyzer, err := m.analyzerFactory.Make(
-		analyzerType,
-		analyzerName,
-		protoInstance,
-	)
-	if err != nil {
-		return fmt.Errorf("cannot create analyzer %s: %s", uuid, err)
+	var analyzer analyzer.Analyzer
+	if setConfig.SlowLogLocation != "auto" {
+		// analyzer, err = m.analyzerFactory.MakeManual(
+		analyzer, err = m.analyzerFactory.Make(
+			analyzerType,
+			//setConfig.SlowLogLocation,
+			analyzerName,
+			protoInstance,
+		)
+	} else {
+		// Create and start a new analyzer. This should return immediately.
+		analyzer, err = m.analyzerFactory.Make(
+			analyzerType,
+			analyzerName,
+			protoInstance,
+		)
+		if err != nil {
+			return fmt.Errorf("cannot create analyzer %s: %s", uuid, err)
+		}
 	}
 
 	// Set the configuration
